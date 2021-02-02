@@ -11,6 +11,7 @@ itemList = list()
 itemCount = dict()
 transactionList = list()
 L = list()
+C = list([] for _ in range(10))
 
 with open(os.path.join(__location__, 'parameters.txt')) as f:
 	for mis in f:
@@ -46,14 +47,26 @@ with open(os.path.join(__location__, 'input.txt')) as f:
 
 mis_values = {k: v for k, v in sorted(mis_values.items(), key=lambda item: item[1])}
 
-# for i in range(len(itemList)):
-#     if(i == 0):
-#         L.append(itemList[0])
-#     else:
-#         if((itemCount.get(itemList[i]) / transactionCount) >= next(iter(mis_values.values()))):
-#             L.append(itemList[i])
-#     for i in range(len(L)):
-#         itemCount[L[i]] = i
+for key in itemCount:
+    if((itemCount.get(key) / transactionCount) >= next(iter(mis_values.values()))):
+        L.append(key)
+
+for l in range (0, len(L)):
+	if(mis_values.get(L[l])):
+		if (itemCount[L[l]] / transactionCount) >= mis_values[L[l]]:
+			for h in range( l + 1, len(L)):
+				if (itemCount[L[h]] / transactionCount) >= mis_values[L[l]] and abs((itemCount[L[h]] / transactionCount) - (itemCount[L[l]] / transactionCount)) <= sdcValue:
+					C[2].append(list())
+					C[2][len(C[2])-1].append(L[l])
+					C[2][len(C[2])-1].append(L[h])
+	else:
+		if (itemCount[L[l]] / transactionCount) >= mis_values['rest']:
+			for h in range( l + 1, len(L)):
+				if (itemCount[L[h]] / transactionCount) >= mis_values['rest'] and abs((itemCount[L[h]] / transactionCount) - (itemCount[L[l]] / transactionCount)) <= sdcValue:
+					C[2].append(list())
+					C[2][len(C[2])-1].append(L[l])
+					C[2][len(C[2])-1].append(L[h])
+    
 
 print(sdcValue)
 print(mis_values)
@@ -61,4 +74,5 @@ print(itemList)
 print(itemCount)
 print(transactionCount)
 print(transactionList)
-# print(L)
+print(L)
+print(C)
