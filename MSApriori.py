@@ -47,8 +47,20 @@ mis_values = {k: v for k, v in sorted(mis_values.items(), key=lambda item: item[
 
 #Loop through item counts to formulate L array
 for key in itemCount:
+	#Element only needs to pass lowest MIS value constraint
     if((itemCount.get(key) / transactionCount) >= next(iter(mis_values.values()))):
         L.append(key)
+
+#Form 1 item frequent itemset
+for key in itemCount:
+	#Check if MIS entry present for this element
+	if(mis_values.get(key)):
+		supportValue = mis_values.get(key)
+	else:
+		supportValue = mis_values['rest']
+	#Element needs to pass MIS constraint
+	if (itemCount[key] / transactionCount) >= supportValue:
+		candidateList[1].append(key)
 
 def level2candidategen():
 	#Consider first element of a new itemset in L
