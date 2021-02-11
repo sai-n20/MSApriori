@@ -8,7 +8,7 @@ tempDict = dict()
 itemCount = dict()
 transactionList = list()
 L = list()
-candidateList = list([] for _ in range(10))
+candidateList = list([] for i in range(5))
 
 def readFiles():
 	global sdcValue, transactionCount
@@ -41,23 +41,34 @@ def readFiles():
 	dataFile.close()
 
 readFiles()
+
+#Sort MIS values
 mis_values = {k: v for k, v in sorted(mis_values.items(), key=lambda item: item[1])}
 
+#Loop through item counts to formulate L array
 for key in itemCount:
     if((itemCount.get(key) / transactionCount) >= next(iter(mis_values.values()))):
         L.append(key)
 
-for lo in range (0, len(L)):
-	if(mis_values.get(L[lo])):
-		supportValue = mis_values.get(L[lo])
-	else:
-		supportValue = mis_values['rest']
-	if (itemCount[L[lo]] / transactionCount) >= supportValue:
-		for hi in range( lo + 1, len(L)):
-			if (itemCount[L[hi]] / transactionCount) >= supportValue and abs((itemCount[L[hi]] / transactionCount) - (itemCount[L[lo]] / transactionCount)) <= sdcValue:
-				candidateList[2].append(list())
-				candidateList[2][len(candidateList[2])-1].append(L[lo])
-				candidateList[2][len(candidateList[2])-1].append(L[hi])
+def level2candidategen():
+	#Consider first element of a new itemset in L
+	for lo in range (0, len(L)):
+		#Check if MIS entry present for this element
+		if(mis_values.get(L[lo])):
+			supportValue = mis_values.get(L[lo])
+		else:
+			supportValue = mis_values['rest']
+		#Element needs to pass MIS constraint
+		if (itemCount[L[lo]] / transactionCount) >= supportValue:
+			#Find 2nd candidate element
+			for hi in range( lo + 1, len(L)):
+				#Element needs to pass MIS constraint and SDC constraint
+				if (itemCount[L[hi]] / transactionCount) >= supportValue and abs((itemCount[L[hi]] / transactionCount) - (itemCount[L[lo]] / transactionCount)) <= sdcValue:
+					#Append list and add 2 elements to this newly appended list
+					candidateList[2].append(list())
+					candidateList[2][len(candidateList[2])-1].append(L[lo])
+					candidateList[2][len(candidateList[2])-1].append(L[hi])
+level2candidategen()
 
 print(sdcValue)
 print(mis_values)
