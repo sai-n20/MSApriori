@@ -10,6 +10,9 @@ transactionList = list()
 L = list()
 candidateList = list([] for i in range(5))
 
+#supportCount is itemcount here
+#n is transactionCount
+
 def readFiles():
 	global sdcValue, transactionCount
 	with open(os.path.join(__location__, 'parameters.txt')) as parameterFile:
@@ -83,9 +86,29 @@ def level2candidategen():
 level2candidategen()
 
 print(sdcValue)
-print(mis_values)
-print(itemCount)
-print(transactionCount)
-print(transactionList)
-print(L)
-print(candidateList)
+#print(mis_values)
+#print(itemCount)
+#print(transactionCount)
+#print(transactionList)
+#print(L)
+#print(candidateList)
+
+def MSCandidate_gen(F, sdcValue):
+    C_k = []
+    for i in F:
+        for j in F:
+            if i!=j:
+                sCount1 = itemCount[i[len(i)-1]]/transactionCount
+                sCount2 = itemCount[j[len(j)-1]]/transactionCount
+                if(i[len(i)-1]<j[len(j)-1]) and (i[:-1]==j[:-1]) and abs (sCount1-sCount2) <=sdcValue:
+                    C_k.append(i+j[-1:])
+                    c = i+j[-1:]
+                    
+                    for k in range(1,len(c)+1):
+                        s = c[:k-1]+c[k:]
+                        if c[0] in s or mis_values[c[1]] == mis_values[c[0]]:
+                            if s not in F:
+                                C_k.remove(c)
+                                break
+    return C_k
+    
