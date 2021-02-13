@@ -10,26 +10,29 @@ transactionList = list()
 L = list()
 candidateList = list([] for i in range(5))
 
-#supportCount is itemcount here
-#n is transactionCount
+# supportCount is itemcount here
+# n is transactionCount
+
 
 def readFiles():
 	global sdcValue, transactionCount
-	with open(os.path.join(__location__, 'parameters.txt')) as parameterFile:
+	with open(os.path.join(__location__, 'Data/As1_MIS3.txt')) as parameterFile:
 		for mis in parameterFile:
 			if(mis.find('SDC') > -1):
 				sdcValue = float(mis.replace(' ', '').rstrip().split('=')[1])
 
 			if(mis.find('rest') > -1):
-				tempDict = mis.replace(' ', '').replace('MIS', '').replace('(', '').replace(')', '').rstrip().split('=')
+				tempDict = mis.replace(' ', '').replace('MIS', '').replace(
+				    '(', '').replace(')', '').rstrip().split('=')
 				mis_values['rest'] = float(tempDict[1])
 
 			elif(mis.find('MIS') > -1):
-				tempDict = mis.replace(' ', '').replace('MIS', '').replace('(', '').replace(')', '').rstrip().split('=')
+				tempDict = mis.replace(' ', '').replace('MIS', '').replace(
+				    '(', '').replace(')', '').rstrip().split('=')
 				mis_values[int(tempDict[0])] = float(tempDict[1])
 	parameterFile.close()
 
-	with open(os.path.join(__location__, 'input.txt')) as dataFile:
+	with open(os.path.join(__location__, 'Data/As1_Sample3.txt')) as dataFile:
 		for trans in dataFile:
 			transactionList.append(list())
 			tempDict = trans.replace(' ', '').split(',')
@@ -43,56 +46,48 @@ def readFiles():
 		transactionCount = len(transactionList)
 	dataFile.close()
 
+
 readFiles()
 
-#Sort MIS values
+# Sort MIS values
 mis_values = {k: v for k, v in sorted(mis_values.items(), key=lambda item: item[1])}
 
-#Loop through item counts to formulate L array
+# Loop through item counts to formulate L array
 for key in itemCount:
-	#Element only needs to pass lowest MIS value constraint
+	# Element only needs to pass lowest MIS value constraint
     if((itemCount.get(key) / transactionCount) >= next(iter(mis_values.values()))):
         L.append(key)
 
-#Form 1 item frequent itemset
-for key in itemCount:
-	#Check if MIS entry present for this element
-	if(mis_values.get(key)):
-		supportValue = mis_values.get(key)
+def MISvalue(item):
+	if(mis_values.get(item)):
+		return mis_values.get(item)
 	else:
-		supportValue = mis_values['rest']
-	#Element needs to pass MIS constraint
-	if (itemCount[key] / transactionCount) >= supportValue:
+		return mis_values['rest']
+
+# Form 1 item frequent itemset
+for key in itemCount:
+	# Element needs to pass MIS constraint
+	if (itemCount[key] / transactionCount) >= MISvalue(key):
 		candidateList[1].append(list())
 		candidateList[1][len(candidateList[1])-1].append(key)
 
+
 def level2candidategen():
-	#Consider first element of a new itemset in L
-	for lo in range (0, len(L)):
-		#Check if MIS entry present for this element
-		if(mis_values.get(L[lo])):
-			supportValue = mis_values.get(L[lo])
-		else:
-			supportValue = mis_values['rest']
-		#Element needs to pass MIS constraint
-		if (itemCount[L[lo]] / transactionCount) >= supportValue:
-			#Find 2nd candidate element
-			for hi in range( lo + 1, len(L)):
-				#Element needs to pass MIS constraint and SDC constraint
-				if (itemCount[L[hi]] / transactionCount) >= supportValue and abs((itemCount[L[hi]] / transactionCount) - (itemCount[L[lo]] / transactionCount)) <= sdcValue:
-					#Append list and add 2 elements to this newly appended list
+	# Consider first element of a new itemset in L
+	for lo in range(0, len(L)):
+		# Element needs to pass MIS constraint
+		if (itemCount[L[lo]] / transactionCount) >= MISvalue(L[lo]):
+			# Find 2nd candidate element
+			for hi in range(lo + 1, len(L)):
+				# Element needs to pass MIS constraint and SDC constraint
+				if (itemCount[L[hi]] / transactionCount) >= MISvalue(L[lo]) and abs((itemCount[L[hi]] / transactionCount) - (itemCount[L[lo]] / transactionCount)) <= sdcValue:
+					# Append list and add 2 elements to this newly appended list
 					candidateList[2].append(list())
 					candidateList[2][len(candidateList[2])-1].append(L[lo])
 					candidateList[2][len(candidateList[2])-1].append(L[hi])
-level2candidategen()
 
-# print(sdcValue)
-#print(mis_values)
-#print(itemCount)
-#print(transactionCount)
-#print(transactionList)
-#print(L)
-#print(candidateList)
+
+level2candidategen()
 
 def MSCandidate_gen(F, sdcValue):
     C_k = []
@@ -107,13 +102,13 @@ def MSCandidate_gen(F, sdcValue):
                     
                     for k in range(1,len(c)+1):
                         s = c[:k-1]+c[k:]
-                        if c[0] in s or mis_values[c[1]] == mis_values[c[0]]:
+                        if c[0] in s or MISvalue(c[1]) == MISvalue(c[0]):
                             if s not in F:
                                 C_k.remove(c)
                                 break
     return C_k
-# candidateList[3] = MSCandidate_gen(candidateList[2], sdcValue)
-# print(candidateList)
+candidateList[3] = MSCandidate_gen(candidateList[2], sdcValue)
+print(candidateList)
 
 def write_output():
 	with open('result.txt', 'w') as output:
