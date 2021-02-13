@@ -63,7 +63,8 @@ for key in itemCount:
 		supportValue = mis_values['rest']
 	#Element needs to pass MIS constraint
 	if (itemCount[key] / transactionCount) >= supportValue:
-		candidateList[1].append(key)
+		candidateList[1].append(list())
+		candidateList[1][len(candidateList[1])-1].append(key)
 
 def level2candidategen():
 	#Consider first element of a new itemset in L
@@ -85,7 +86,7 @@ def level2candidategen():
 					candidateList[2][len(candidateList[2])-1].append(L[hi])
 level2candidategen()
 
-print(sdcValue)
+# print(sdcValue)
 #print(mis_values)
 #print(itemCount)
 #print(transactionCount)
@@ -111,4 +112,22 @@ def MSCandidate_gen(F, sdcValue):
                                 C_k.remove(c)
                                 break
     return C_k
-    
+# candidateList[3] = MSCandidate_gen(candidateList[2], sdcValue)
+# print(candidateList)
+
+def write_output():
+	with open('result.txt', 'w') as output:
+		for itemset in candidateList:
+			if(len(itemset) > 0):
+				output.write("(Length-{} {}\n".format(len(itemset[0]), len(itemset)))
+				for item in itemset:
+					output.write("\t(")
+					for index, elem in enumerate(item):
+						if(index < len(item) - 1):
+							output.write("{} ".format(elem))
+						else:
+							output.write("{}".format(elem))
+					output.write(")\n")
+				output.write(")\n")
+	output.close()
+write_output()
