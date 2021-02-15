@@ -6,6 +6,7 @@ __location__ = os.path.realpath(os.path.join(
 mis_values = dict()
 tempDict = dict()
 itemCount = dict()
+support = dict()
 transactionList = list()
 L = list()
 candidateList = list([] for i in range(20))
@@ -125,6 +126,7 @@ while(len(frequentList[loopIterator - 1]) > 0):
 		if(support[c]/transactionCount) >= MISvalue(c[0]):
 			frequentList[loopIterator].append(c)
 	loopIterator += 1
+
 
 def write_output():
 	with open('result.txt', 'w') as output:
