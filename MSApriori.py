@@ -8,8 +8,9 @@ tempDict = dict()
 itemCount = dict()
 transactionList = list()
 L = list()
-candidateList = list([] for i in range(50))
+candidateList = list([] for i in range(20))
 sdcValue = 1
+frequentList = list([] for i in range(20))
 
 # supportCount is itemcount here
 # n is transactionCount
@@ -17,7 +18,7 @@ sdcValue = 1
 
 def readFiles():
 	global sdcValue, transactionCount
-	with open(os.path.join(__location__, 'Data/As1_MIS.txt')) as parameterFile:
+	with open(os.path.join(__location__, 'Data/As1_MIS3.txt')) as parameterFile:
 		for mis in parameterFile:
 			if(mis.find('SDC') > -1):
 				sdcValue = float(mis.replace(' ', '').rstrip().split('=')[1])
@@ -33,7 +34,7 @@ def readFiles():
 				mis_values[int(tempDict[0])] = float(tempDict[1])
 	parameterFile.close()
 
-	with open(os.path.join(__location__, 'Data/As1_Sample.txt')) as dataFile:
+	with open(os.path.join(__location__, 'Data/As1_Sample3.txt')) as dataFile:
 		for trans in dataFile:
 			transactionList.append(list())
 			tempDict = trans.replace(' ', '').split(',')
@@ -69,8 +70,9 @@ def MISvalue(item):
 for key in itemCount:
 	# Element needs to pass MIS constraint
 	if (itemCount[key] / transactionCount) >= MISvalue(key):
-		candidateList[1].append(list())
-		candidateList[1][len(candidateList[1])-1].append(key)
+		frequentList[1].append(list())
+		frequentList[1][len(frequentList[1]) - 1].append(key)
+		# frequentList[1].append(key)
 
 def level2candidategen():
 	# Consider first element of a new itemset in L
@@ -81,10 +83,9 @@ def level2candidategen():
 			for hi in range(lo + 1, len(L)):
 				# Element needs to pass MIS constraint and SDC constraint
 				if (itemCount[L[hi]] / transactionCount) >= MISvalue(L[lo]) and abs((itemCount[L[hi]] / transactionCount) - (itemCount[L[lo]] / transactionCount)) <= sdcValue:
-					# Append list and add 2 elements to this newly appended list
-					candidateList[2].append(list())
-					candidateList[2][len(candidateList[2])-1].append(L[lo])
-					candidateList[2][len(candidateList[2])-1].append(L[hi])
+					# Append tuple of 2-itemset
+					twoItemset = L[lo], L[hi]
+					candidateList[2].append(twoItemset)
 
 
 def MSCandidate_gen(F):
@@ -108,25 +109,28 @@ def MSCandidate_gen(F):
 
 
 loopIterator = 2
-while(len(candidateList[loopIterator - 1]) > 0):
+while(len(frequentList[loopIterator - 1]) > 0):
 	if(loopIterator == 2):
 		level2candidategen()
 	else:
-		candidateList[loopIterator] = MSCandidate_gen(candidateList[loopIterator - 1])
-    
-    for i in transactionList:
-        for j in candidateList[loopIterator]:
-            if set(j).isusbset(i):
-                support[j] +=1
-    for c,i in support.items():
-        if (support[c]/transactionCount) >= MISvalue[c[0]]:
-            candidateList[loopIterator].append(c)
-    loopIterator += 1
+		candidateList[loopIterator] = MSCandidate_gen(frequentList[loopIterator - 1])
+	support = {}
+	for i in candidateList[loopIterator]:
+		support[i] = 0
+	for i in transactionList:
+		for j in candidateList[loopIterator]:
+			if(set(j).issubset(i)):
+				support[j] += 1
+	for c, i in support.items():
+		if(support[c]/transactionCount) >= MISvalue(c[0]):
+			frequentList[loopIterator].append(c)
+	loopIterator += 1
 
 def write_output():
 	with open('result.txt', 'w') as output:
-		for itemset in candidateList:
+		for itemset in frequentList:
 			if(len(itemset) > 0):
+				# if(type)
 				output.write("(Length-{} {}\n".format(len(itemset[0]), len(itemset)))
 				for item in itemset:
 					output.write("\t(")
