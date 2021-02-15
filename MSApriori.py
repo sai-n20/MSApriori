@@ -8,7 +8,7 @@ tempDict = dict()
 itemCount = dict()
 transactionList = list()
 L = list()
-candidateList = list([] for i in range(10))
+candidateList = list([] for i in range(50))
 sdcValue = 1
 
 # supportCount is itemcount here
@@ -17,7 +17,7 @@ sdcValue = 1
 
 def readFiles():
 	global sdcValue, transactionCount
-	with open(os.path.join(__location__, 'Data/As1_MIS3.txt')) as parameterFile:
+	with open(os.path.join(__location__, 'Data/As1_MIS.txt')) as parameterFile:
 		for mis in parameterFile:
 			if(mis.find('SDC') > -1):
 				sdcValue = float(mis.replace(' ', '').rstrip().split('=')[1])
@@ -33,7 +33,7 @@ def readFiles():
 				mis_values[int(tempDict[0])] = float(tempDict[1])
 	parameterFile.close()
 
-	with open(os.path.join(__location__, 'Data/As1_Sample3.txt')) as dataFile:
+	with open(os.path.join(__location__, 'Data/As1_Sample.txt')) as dataFile:
 		for trans in dataFile:
 			transactionList.append(list())
 			tempDict = trans.replace(' ', '').split(',')
