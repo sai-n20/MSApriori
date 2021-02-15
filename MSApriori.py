@@ -8,7 +8,8 @@ tempDict = dict()
 itemCount = dict()
 transactionList = list()
 L = list()
-candidateList = list([] for i in range(5))
+candidateList = list([] for i in range(10))
+sdcValue = 1
 
 # supportCount is itemcount here
 # n is transactionCount
@@ -71,7 +72,6 @@ for key in itemCount:
 		candidateList[1].append(list())
 		candidateList[1][len(candidateList[1])-1].append(key)
 
-
 def level2candidategen():
 	# Consider first element of a new itemset in L
 	for lo in range(0, len(L)):
@@ -87,16 +87,14 @@ def level2candidategen():
 					candidateList[2][len(candidateList[2])-1].append(L[hi])
 
 
-level2candidategen()
-
-def MSCandidate_gen(F, sdcValue):
+def MSCandidate_gen(F):
     C_k = []
     for i in F:
         for j in F:
             if i!=j:
                 sCount1 = itemCount[i[len(i)-1]]/transactionCount
                 sCount2 = itemCount[j[len(j)-1]]/transactionCount
-                if(i[len(i)-1]<j[len(j)-1]) and (i[:-1]==j[:-1]) and abs (sCount1-sCount2) <=sdcValue:
+                if(i[len(i)-1]<j[len(j)-1]) and (i[:-1]==j[:-1]) and sdcValue >= abs(sCount1-sCount2):
                     C_k.append(i+j[-1:])
                     c = i+j[-1:]
                     
@@ -107,8 +105,15 @@ def MSCandidate_gen(F, sdcValue):
                                 C_k.remove(c)
                                 break
     return C_k
-candidateList[3] = MSCandidate_gen(candidateList[2], sdcValue)
-print(candidateList)
+
+
+loopIterator = 2
+while(len(candidateList[loopIterator - 1]) > 0):
+	if(loopIterator == 2):
+		level2candidategen()
+	else:
+		candidateList[loopIterator] = MSCandidate_gen(candidateList[loopIterator - 1])
+	loopIterator += 1
 
 def write_output():
 	with open('result.txt', 'w') as output:
