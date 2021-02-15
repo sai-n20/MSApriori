@@ -6,6 +6,7 @@ __location__ = os.path.realpath(os.path.join(
 mis_values = dict()
 tempDict = dict()
 itemCount = dict()
+support = dict()
 transactionList = list()
 L = list()
 candidateList = list([] for i in range(50))
@@ -108,20 +109,28 @@ def MSCandidate_gen(F):
 
 
 loopIterator = 2
+
 while(len(candidateList[loopIterator - 1]) > 0):
-	if(loopIterator == 2):
-		level2candidategen()
-	else:
-		candidateList[loopIterator] = MSCandidate_gen(candidateList[loopIterator - 1])
+    if(loopIterator == 2):
+        level2candidategen()
+    else:
+        candidateList[loopIterator] = MSCandidate_gen(candidateList[loopIterator - 1])
+    
+    support = {}
+    for i in candidateList[loopIterator]:
+        support[i] = 0
     
     for i in transactionList:
         for j in candidateList[loopIterator]:
-            if set(j).isusbset(i):
+            if set(j).issubset(i):
                 support[j] +=1
+                
     for c,i in support.items():
         if (support[c]/transactionCount) >= MISvalue[c[0]]:
             candidateList[loopIterator].append(c)
+            
     loopIterator += 1
+
 
 def write_output():
 	with open('result.txt', 'w') as output:
