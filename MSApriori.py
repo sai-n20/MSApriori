@@ -113,7 +113,15 @@ while(len(candidateList[loopIterator - 1]) > 0):
 		level2candidategen()
 	else:
 		candidateList[loopIterator] = MSCandidate_gen(candidateList[loopIterator - 1])
-	loopIterator += 1
+    
+    for i in transactionList:
+        for j in candidateList[loopIterator]:
+            if set(j).isusbset(i):
+                support[j] +=1
+    for c,i in support.items():
+        if (support[c]/transactionCount) >= MISvalue[c[0]]:
+            candidateList[loopIterator].append(c)
+    loopIterator += 1
 
 def write_output():
 	with open('result.txt', 'w') as output:
