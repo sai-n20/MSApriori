@@ -19,7 +19,7 @@ frequentList = list([] for i in range(20))
 
 def readFiles():
 	global sdcValue, transactionCount
-	with open(os.path.join(__location__, 'Data/As1_MIS3.txt')) as parameterFile:
+	with open(os.path.join(__location__, 'para-2.txt')) as parameterFile:
 		for mis in parameterFile:
 			if(mis.find('SDC') > -1):
 				sdcValue = float(mis.replace(' ', '').rstrip().split('=')[1])
@@ -33,25 +33,32 @@ def readFiles():
 				tempDict = mis.replace(' ', '').replace('MIS', '').replace(
 				    '(', '').replace(')', '').rstrip().split('=')
 				mis_values[int(tempDict[0])] = float(tempDict[1])
+				# mis_values[tempDict[0]] = float(tempDict[1])
 	parameterFile.close()
 
-	with open(os.path.join(__location__, 'Data/As1_Sample3.txt')) as dataFile:
+	with open(os.path.join(__location__, 'data-2.txt')) as dataFile:
+		# test = 0
 		for trans in dataFile:
 			transactionList.append(list())
-			tempDict = trans.replace(' ', '').split(',')
+			tempDict = trans.replace('\n', '').replace(' ', '').split(',')
+			# print(test)
+			# print(trans)
+			# tempDict = trans.replace('\n', '').replace(' ', '').rstrip().split(',')
 			for item in tempDict:
+				# print(item)
 				item = int(item)
 				transactionList[len(transactionList) - 1].append(item)
 				if(itemCount.get(item)):
 					itemCount[item] = itemCount.get(item) + 1
 				else:
 					itemCount[item] = 1
+			# test += 1
 		transactionCount = len(transactionList)
 	dataFile.close()
 
 
 readFiles()
-
+# print(mis_values)
 # Sort MIS values
 mis_values = {k: v for k, v in sorted(mis_values.items(), key=lambda item: item[1])}
 
@@ -129,7 +136,8 @@ while(len(frequentList[loopIterator - 1]) > 0):
 
 
 def write_output():
-	with open('result.txt', 'w') as output:
+	with open('result-2.txt', 'w') as output:
+		output.write('36-34\n')
 		for itemset in frequentList:
 			if(len(itemset) > 0):
 				# if(type)
